@@ -136,16 +136,19 @@ def parse_json(path):
 def main():
     parser = argparse.ArgumentParser(description="Process antismash JSON output to extract blast and mibig results.")
     parser.add_argument('path', type=str, help='Path to the directory containing antismash outputs')
-    parser.add_argument('blast_output', type=str, help='Filename for the blast output CSV')
-    parser.add_argument('mibig_output', type=str, help='Filename for the mibig output CSV')
+    # parser.add_argument('blast_output', type=str, help='Filename for the blast output CSV')
+    # parser.add_argument('mibig_output', type=str, help='Filename for the mibig output CSV')
 
     args = parser.parse_args()
 
     df_blast, df_mibig = parse_json(args.path)
 
+    if not "temp_file" in os.listdir():
+        os.mkdir("temp_file")
+
     # Save DataFrames to CSV files
-    df_blast.to_csv(args.blast_output, index=False)
-    df_mibig.to_csv(args.mibig_output, index=False)
+    df_blast.to_csv("temp_file/blast_scores.csv", index=False)
+    df_mibig.to_csv("temp_file/mibig_hits.csv", index=False)
 
 if __name__ == "__main__":
     main()
