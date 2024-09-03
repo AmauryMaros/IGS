@@ -7,11 +7,9 @@
 #SBATCH --job-name=job_name                 # Name of the job
 #SBATCH --output=path/to/logs/%x_%A_%a.out  # Standard output log (%x is job name, %A is job ID, %a is array task ID)
 #SBATCH --error=path/to/logs/%x_%A_%a.err   # Standard error log (%x is job name, %A is job ID, %a is array task ID)
-#SBATCH --ntasks=1                          # Run on a single task
-#SBATCH --cpus-per-task=8                   # Number of CPU cores per task
 #SBATCH --mem=16G                           # Memory per node
 #SBATCH --array=1-10                        # Array job
-#SBATCH --partition=general                 # Specify the partition (general queue)
+#SBATCH --partition=all                     # Specify the partition (general queue)
 
 #######################################
 # Conda activation
