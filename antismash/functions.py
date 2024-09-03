@@ -191,7 +191,7 @@ def get_similarity_score_w_annotation(json_file, idx):
                 similarity_score = pd.DataFrame(data_score).reset_index().rename(columns={"index":"Reference"})
                 similarity_score['Position'] = similarity_score['Reference'].apply(lambda x : x.split(": ")[1])
                 similarity_score['Reference'] = similarity_score['Reference'].apply(lambda x : x.split(": ")[0])
-                similarity_score['region'] = idx
+                similarity_score['Region'] = idx
             else :
                 similarity_score = None
             
@@ -210,15 +210,43 @@ def get_similarity_score_w_annotation(json_file, idx):
                 data_annotation = None
         if (similarity_score is not None) and (data_annotation is not None):    # the or & and statements in Python require TRUTH values 
             df = pd.merge(similarity_score, pd.DataFrame(data_annotation), on="Reference", how="left")
+            df = df.drop_duplicates()
         else :
             df = None
 
     return df
 
+def get_mibig_comparison_score(json_file, idx):
+
+    results = json_file['records'][idx]['modules']['antismash.modules.cluster_compare']['db_results']['MIBiG']['by_region']
+    data_score = []
+    for region_idx in results.keys():
+        for analysis in results[region_idx].keys():
+            details = results[region_idx][analysis]['details']['details']
+            
+            # Check if 'details' is a list or a dictionary
+            if isinstance(details, dict):
+                for bgc in details.keys():
+                    score = details[bgc]
+                    
+                    # Check if 'refs' is a list or a dictionary
+                    if isinstance(score, dict):
+                        for bgc in score.keys():
+                            df = pd.DataFrame(score[bgc])
+                            df['bgc'] = bgc
+                            data_score.append(df)
+                    elif isinstance(score, list):
+                        # Handle the case where 'refs' is a list
+                        data_score.extend(score)
+            elif isinstance(details, list):
+                # Handle the case where 'details' is a list
+                data_score.extend(details)
+
+    # Check the results in data_score
+    pd.DataFrame(data_score)
 
 
-
-def get_mibig_comparison(path):
+def parse_json(path):
     """
     Extract data from MIBiG Comparison tab in antiSMASH HTML output.
     
