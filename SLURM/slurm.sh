@@ -28,4 +28,4 @@ cd /path/to/working/directory
 infile=$(sed -n "${SLURM_ARRAY_TASK_ID}p" list_of_samples.txt)
 
 # Run the script
-Rscript path/to/Rscript.R  --cpus $SLURM_CPUS_PER_TASK
+Rscript path/to/Rscript.R path/to/samples/${infile}.fasta
