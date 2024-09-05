@@ -26,10 +26,16 @@ Using sektq
 seqtk comp file.fasta | wc -l
 ```
 
-## Number of file with .out extension
+## Number of file with .txt extension
 ```bash
 ls -1 *.txt | wc -l
 ```
+
+## Number of non empty file in a directory
+```bash
+find . -type f -size +0c
+```
+
 
 ## Create a symlink
 ```bash
