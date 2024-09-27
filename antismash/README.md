@@ -37,7 +37,7 @@ Once the JSON files are gathered, this step compiles data from them into several
 python 02_process_antismash_json.py path/to/JSON_directory path/to/CSV_files
 ```
 
-This command generates four CSV files:
+This command generates 4 CSV files:
 
 * ```blast_score.csv```
 * ```mibig_entries.csv```
