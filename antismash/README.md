@@ -39,8 +39,8 @@ python 02_process_antismash_json.py path/to/JSON_directory path/to/CSV_files
 
 This command generates four CSV files:
 
-* blast score
-* mibig entries
-* query_to_reference
-* similarity score
+* ```blast_score.csv```
+* ```mibig_entries.csv```
+* ```query_to_reference.csv```
+* ```similarity_score.csv```
 
