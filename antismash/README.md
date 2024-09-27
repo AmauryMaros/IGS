@@ -11,7 +11,7 @@ cd path/to/pipeline
 
 This step processes the antiSMASH results by iterating through directories and extracting .json files.
 
-## Example:
+### Example:
 ```bash
 python 01_process_antismash_output.py path/to/results_antiSMASH path/to/JSON_directory
 ```
@@ -24,15 +24,11 @@ python 01_process_antismash_output.py path/to/results_antiSMASH path/to/JSON_dir
 
 * ```JSON_directory``` is created if it doesn't already exist.
 
-
-
 ## 3. Extract Data from JSON Files
 
 Once the JSON files are gathered, this step compiles data from them into several CSV files.
 
-
-
-## Example
+### Example
 ```bash
 python 02_process_antismash_json.py path/to/JSON_directory path/to/CSV_files
 ```
