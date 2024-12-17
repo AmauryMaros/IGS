@@ -16,17 +16,19 @@ def main():
         return
 
     # Call the parse_json function
-    query_to_reference_df, similarity_score_df, blast_score_df, mibig_entries_df = parse_json(args.path)
+    region_summary_df, query_to_reference_df, similarity_score_df, blast_score_df, mibig_entries_df, cluster_blast_df = parse_json(args.path)
 
     # Create the temp directory in the specified or default location
     if not os.path.exists(args.temp_dir):
         os.mkdir(args.temp_dir)
 
     # Save DataFrames to CSV files
+    region_summary_df.to_csv(os.path.join(args.temp_dir, "region_summary.csv"), index=False)
     query_to_reference_df.to_csv(os.path.join(args.temp_dir, "query_to_reference.csv"), index=False)
     similarity_score_df.to_csv(os.path.join(args.temp_dir, "similarity_score.csv"), index=False)
     blast_score_df.to_csv(os.path.join(args.temp_dir, "blast_score.csv"), index=False)
     mibig_entries_df.to_csv(os.path.join(args.temp_dir, "mibig_entries.csv"), index=False)
+    cluster_blast_df.to_csv(os.path.join(args.temp_dir, "cluster_blast.csv"), index=False)
 
 if __name__ == "__main__":
     main()
