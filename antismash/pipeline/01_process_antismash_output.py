@@ -72,4 +72,3 @@ def main():
 # Run the main function when the script is executed
 if __name__ == "__main__":
     main()
-
