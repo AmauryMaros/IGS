@@ -77,7 +77,7 @@ def get_mibig_entries(json_file: dict, idx: int) -> pd.DataFrame:
     pd.DataFrame
         DataFrame of MIBiG entries.
     """
-    
+
     try:
         # Access modules for the given index
         modules = json_file["records"][idx]["modules"]["antismash.modules.clusterblast"]["knowncluster"]
@@ -101,7 +101,7 @@ def get_mibig_entries(json_file: dict, idx: int) -> pd.DataFrame:
                 df_mibig_list.append(df_tag_id)
     else:
         print(f"No 'mibig_entries' found for record {idx}")
-        
+
     # Concatenate all DataFrames for mibig entries
     if df_mibig_list:
             df_mibig = pd.concat(df_mibig_list, axis=0, ignore_index=True)
@@ -121,6 +121,7 @@ def get_mibig_entries(json_file: dict, idx: int) -> pd.DataFrame:
             df_mibig = pd.DataFrame()
 
     return df_mibig
+
 
 def get_query_to_reference_match(json_file: dict, idx: int) -> pd.DataFrame:
     """
@@ -150,7 +151,7 @@ def get_query_to_reference_match(json_file: dict, idx: int) -> pd.DataFrame:
     except KeyError as e:
         print(f"KeyError: {e}")
         return pd.DataFrame()
-    
+
     for region in results.keys():
         for bgc in results[region]['ProtoToRegion_RiQ']['hits'].keys():
             ctg_table = results[region]['ProtoToRegion_RiQ']['hits'][bgc]
@@ -166,12 +167,13 @@ def get_similarity_score_w_annotation(json_file: dict, idx: int) -> pd.DataFrame
     """
     Extract data from MIBiG Comparison tab in antiSMASH HTML output.
     
-    This function return the similarity score for different kinds of analysis (ex: Protocluster to Region) with annotation related to each reference
+    This function returns the similarity score for different kinds of analysis (e.g., Protocluster to Region) 
+    with annotations related to each reference.
 
     Parameters
     ----------
     json_file : dict
-        json file from antismash output.
+        JSON file from antiSMASH output.
     idx : int
         Index of the record in the JSON file.
 
@@ -180,51 +182,117 @@ def get_similarity_score_w_annotation(json_file: dict, idx: int) -> pd.DataFrame
     df : DataFrame
         DataFrame of results.
     """
-
     try:
         results = json_file['records'][idx]['modules']['antismash.modules.cluster_compare']['db_results']['MIBiG']['by_region']
-    
     except KeyError as e:
         print(f"KeyError: {e}")
         return pd.DataFrame()
-    
 
     data_score = {}
-    data_annotation = []
+    data_annotation = []  # Initialize as an empty list
 
     for region_idx in results.keys():
         for analysis in results[region_idx].keys():
-            scores_by_region = results[region_idx][analysis]['scores_by_region']
-            if scores_by_region != {}:
+            scores_by_region = results[region_idx][analysis].get('scores_by_region', {})
+            if scores_by_region:
                 data_score[analysis] = scores_by_region
-                similarity_score = pd.DataFrame(data_score).reset_index().rename(columns={"index":"Reference"})
-                similarity_score['Position'] = similarity_score['Reference'].apply(lambda x : x.split(": ")[1])
-                similarity_score['Reference'] = similarity_score['Reference'].apply(lambda x : x.split(": ")[0])
-                similarity_score['Region'] = f"{idx+1}.{region_idx}"
-                similarity_score['Sequence'] = json_file['records'][idx]['id']
-            else :
+                similarity_score = pd.DataFrame(data_score).reset_index().rename(columns={"index": "reference"})
+                similarity_score['position'] = similarity_score['reference'].apply(lambda x: x.split(": ")[1])
+                similarity_score['reference'] = similarity_score['reference'].apply(lambda x: x.split(": ")[0])
+                similarity_score['region'] = f"{idx+1}.{region_idx}"
+                similarity_score['sequence'] = json_file['records'][idx]['id']
+            else:
                 similarity_score = None
-            
-            reference_regions = results[region_idx][analysis]['reference_regions']
-            if reference_regions != {}:
+
+            reference_regions = results[region_idx][analysis].get('reference_regions', {})
+            if reference_regions:
                 for bgc in reference_regions.keys():
-                        hit = reference_regions[bgc]
-                        entry = {
-                        'Reference': hit.get('accession'),
-                        'Type': '; '.join(hit.get('products')),
-                        'Compound': hit.get('description'),
-                        'Organism': hit.get('organism')
-                        }
-                        data_annotation.append(entry)
-            else :
-                data_annotation = None
-        if (similarity_score is not None) and (data_annotation is not None):    # the or & and statements in Python require TRUTH values 
-            df = pd.merge(similarity_score, pd.DataFrame(data_annotation), on="Reference", how="left")
-            df = df.drop_duplicates()
-        else :
-            df = None
+                    hit = reference_regions[bgc]
+                    entry = {
+                        'reference': hit.get('accession'),
+                        'type': '; '.join(hit.get('products')),
+                        'compound': hit.get('description'),
+                        'organism': hit.get('organism')
+                    }
+                    data_annotation.append(entry)  # Append to the list only when valid data is found
+
+    if similarity_score is not None and data_annotation:
+        df = pd.merge(similarity_score, pd.DataFrame(data_annotation), on="reference", how="left")
+        df = df.drop_duplicates()
+    else:
+        df = pd.DataFrame()  # Return an empty DataFrame if there's no valid data
 
     return df
+
+
+def get_region_summary(json_file: dict, idx: int) -> pd.DataFrame:
+
+    rows = []
+    for i,j in enumerate(json_file['records'][idx]['areas']):
+            rows.append([json_file['records'][idx]['description'], f"{idx+1}.{i+1}",j['products']])
+    region_type = pd.DataFrame(rows, columns=['sequence', 'region','type'])
+
+    rows = []
+    if json_file['records'][idx]['modules']['antismash.modules.clusterblast']['knowncluster']['results'][0]['ranking'] != []:
+
+            for hits_rank in range(len(json_file['records'][idx]['modules']['antismash.modules.clusterblast']['knowncluster']['results'][0]['ranking'])):
+                sequence = json_file['records'][idx]['id']
+                most_similar_known_cluster = json_file['records'][idx]['modules']['antismash.modules.clusterblast']['knowncluster']['results'][0]['ranking'][hits_rank][0]['description']
+                most_similar_known_cluster_type = json_file['records'][idx]['modules']['antismash.modules.clusterblast']['knowncluster']['results'][0]['ranking'][hits_rank][0]['cluster_type']
+                similarity = json_file['records'][idx]['modules']['antismash.modules.clusterblast']['knowncluster']['results'][0]['ranking'][hits_rank][1]['similarity']
+
+                rows.append([sequence,most_similar_known_cluster,most_similar_known_cluster_type,similarity])
+
+    most_similar_known_cluster_df = pd.DataFrame(rows, columns=['sequence', 'most_similar_known_cluster', 'most_similar_known_cluster_type', 'similarity'])
+
+    region_summary = pd.merge(region_type, most_similar_known_cluster_df, on='sequence', how='left')
+
+    return region_summary
+
+
+
+def get_cluster_blast_result(json_file: dict, idx: int) -> pd.DataFrame:
+    try:
+        results = json_file['records'][idx]['modules']['antismash.modules.clusterblast']['general']['results']
+    except KeyError as e:
+        print(f"KeyError: {e}")
+        return pd.DataFrame()
+
+    data_annotation = []
+    for region_idx in range(len(results)):
+            for hit_idx in range(len(results[region_idx]['ranking'])):
+                hit = results[region_idx]['ranking'][hit_idx][0]
+                entry = {
+                    'accession': hit.get('accession'),
+                    'cluster_label': hit.get('cluster_label'),
+                    'description': hit.get('description'),
+                    'cluster_type': hit.get('cluster_type'),
+                    'number_of_genes_in_ref': len(hit.get('proteins'))
+                }
+                data_annotation.append(entry)
+
+
+    data_metrics = []
+    for region_idx in range(len(results)):
+            for hit_idx in range(len(results[region_idx]['ranking'])):
+                hit = results[region_idx]['ranking'][hit_idx][1]
+                entry = {
+                    'hits': hit.get('hits'),
+                    'core_gene_hits': hit.get('core_gene_hits'),
+                    'synteny_score': hit.get('synteny_score'),
+                    'core_bonus': hit.get('core_bonus'),
+                    'similarity':hit.get('similarity')
+                }
+                data_metrics.append(entry)
+
+    df_annotation = pd.DataFrame(data_annotation)
+    df_metrics = pd.DataFrame(data_metrics)
+
+    df_clusterblast = pd.concat([df_annotation, df_metrics], axis=1)
+    df_clusterblast['sequence'] = json_file['records'][idx]['modules']['antismash.modules.clusterblast']['general']['record_id']
+
+    return df_clusterblast
+
 
 
 def parse_json(path):
@@ -251,10 +319,12 @@ def parse_json(path):
     """
 
     # Initialize empty lists
+    region_summary = []
     query_to_reference = []
     similarity_score = []
     blast_score = []
     mibig_entries = []
+    cluster_blast = []
 
     # Iterate over all directories in the specified path
     ignore_patterns = {".DS_Store", ".cache"}
@@ -270,20 +340,25 @@ def parse_json(path):
             except Exception as e:
                 print(f"Error reading {elt}: {e}. Skipping file.")
                 continue
-            
+
             # Get indices for records with desired key conditions
             indices = get_index(json_file)
 
             # Iterate over all sequences with results
             for idx in indices :
+                region_summary.append(get_region_summary(json_file, idx))
                 query_to_reference.append(get_query_to_reference_match(json_file, idx))
                 similarity_score.append(get_similarity_score_w_annotation(json_file, idx))
                 blast_score.append(get_blast_scores(json_file, idx))
                 mibig_entries.append(get_mibig_entries(json_file, idx))
+                cluster_blast.append(get_cluster_blast_result(json_file, idx))
 
+    region_summary_df = pd.concat(region_summary, ignore_index=True) if region_summary else pd.DataFrame()
     query_to_reference_df = pd.concat(query_to_reference, ignore_index=True) if query_to_reference else pd.DataFrame()
     similarity_score_df = pd.concat(similarity_score, ignore_index=True) if similarity_score else pd.DataFrame()
     blast_score_df = pd.concat(blast_score, ignore_index=True) if blast_score else pd.DataFrame()
     mibig_entries_df = pd.concat(mibig_entries, ignore_index=True) if mibig_entries else pd.DataFrame()
+    cluster_blast_df = pd.concat(cluster_blast, ignore_index=True) if cluster_blast else pd.DataFrame()
 
-    return query_to_reference_df, similarity_score_df, blast_score_df, mibig_entries_df
+    return region_summary_df, query_to_reference_df, similarity_score_df, blast_score_df, mibig_entries_df, cluster_blast_df
+    
