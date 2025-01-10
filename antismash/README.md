@@ -1,42 +1,15 @@
-# Pipeline for processing antiSMASH results
+# antiSMASH
 
-## 1. Go to the Pipeline Directory
-Navigate to the pipeline directory where the processing scripts are located.
+## 1. Run antiSMASH
 
 ```bash
-cd path/to/pipeline
+cd 01_run_antiSMASH
+sbatch array_job_antiSMASH.sh
 ```
 
-## 2. Get JSON Files with antiSMASH Results
+## 2. Parse JSON
 
-This step processes the antiSMASH results by iterating through directories and extracting .json files.
-
-### Example:
 ```bash
-python 01_process_antismash_output.py path/to/results_antiSMASH path/to/JSON_directory
+cd 02_pipeline
+./parse_jsons.sh
 ```
-
-### Notes
-
-* This command will iterate through all directories in ```results_antiSMASH``` and copy the ```.json``` files into ```JSON_directory```.
-
-* ```results_antiSMASH``` contains a list of directories (one for each FASTA file processed by antiSMASH), accordingly to the ```--output-dir``` argument used in the antiSMASH command.
-
-* ```JSON_directory``` is created if it doesn't already exist.
-
-## 3. Extract Data from JSON Files
-
-Once the JSON files are gathered, this step compiles data from them into several CSV files.
-
-### Example
-```bash
-python 02_process_antismash_json.py path/to/JSON_directory path/to/CSV_files
-```
-
-This command generates 4 CSV files:
-
-* ```blast_score.csv```
-* ```mibig_entries.csv```
-* ```query_to_reference.csv```
-* ```similarity_score.csv```
-
