@@ -14,3 +14,5 @@ rm -f *.aux *.log *.out *.toc *.fls *.fdb_latexmk
 
 echo "Compilation complete and temporary files removed."
 
+# Export to .docx
+# pandoc main.tex -o main.docx
