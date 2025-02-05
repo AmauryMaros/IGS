@@ -1,12 +1,18 @@
 #!/bin/bash
 
 # Create output directories if they don't exist
+mkdir -p data/raw
 mkdir -p data/trimm
 mkdir -p data/bam
 mkdir -p data/quants
 mkdir -p FASTQC_report/raw
 mkdir -p FASTQC_report/trimm
 mkdir -p Genome
+
+# Symlink raw data to data/raw
+for file in "path_to_raw_data/"*.fq.gz; do 
+    ln -sf "$file" "data/raw/$(basename "$file")";
+done
 
 # Download and extract reference genome
 wget -P Genome https://genome-idx.s3.amazonaws.com/hisat/grch38_genome.tar.gz
