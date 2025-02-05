@@ -13,6 +13,7 @@ conda install -c bioconda
 ```
 ## Create architecture
 ```bash
+# Update the path for raw data then run
 ./01_make_architecture.sh
 ```
 
