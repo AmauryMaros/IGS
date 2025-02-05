@@ -11,10 +11,16 @@ Install hisat2 with brew or conda
 brew install hisat2
 conda install -c bioconda
 ```
+
 ## Create architecture
 ```bash
 # Update the path for raw data then run
 ./01_make_architecture.sh
+```
+
+## Process the raw data
+```bash
+./02_
 ```
 
 FastQC v0.12.1
