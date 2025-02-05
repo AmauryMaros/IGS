@@ -2,7 +2,7 @@
 
 ## Create conda envs with required packages
 ```bash
-conda create -n RNAseq_env python=3.8
+conda create -n RNAseq_env
 conda activate RNAseq_env
 conda install -c bioconda fastqc trimmomatic subread samtools
 ```
@@ -20,12 +20,26 @@ conda install -c bioconda
 
 ## Process the raw data
 ```bash
-./02_
+# If few samples
+./02_runRNASeq_Pipeline.sh
+# or using an array after updating path
+./pipeline_array.sh
 ```
 
+## Create count matrix
+```bash
+# Require R with dplyr
+./03_count_matrix.sh
+```
+
+
 FastQC v0.12.1
+
 trimmomatic v0.39
+
 hisat2 v2.2.1
+
 featureCounts v2.0.8
 
-Python 3.8.16
+
+
