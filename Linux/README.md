@@ -3,6 +3,7 @@
 ## Inline loop
 ```bash
 for i in {1..12}; do cat "rsem_${i}.err" | tail -n 5;done
+for i in *.err; do cat "$i"; done
 ```
 
 ## Number of lines in a file
