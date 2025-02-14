@@ -1,5 +1,10 @@
 # Usefull commands
 
+## Inline loop
+```bash
+for i in {1..12}; do cat "rsem_${i}.err" | tail -n 5;done
+```
+
 ## Number of lines in a file
 ```bash
 wc -l <file>
