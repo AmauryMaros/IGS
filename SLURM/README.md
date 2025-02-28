@@ -26,3 +26,7 @@ Get cluster information
 sinfo -o "%n %e %m %a %C"
 ```
 
+## Job efficiency
+```bash
+seff <jobID>
+```
