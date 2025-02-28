@@ -1,5 +1,11 @@
 # Usefull commands
 
+## Extract lines from file
+```bash
+# Ex: lines 10 to 35
+sed -n '10,35p' input.txt > output.txt
+```
+
 ## Inline loop
 ```bash
 for i in {1..12}; do cat "rsem_${i}.err" | tail -n 5;done
