@@ -1,5 +1,10 @@
 # Usefull commands
 
+## awk
+```bash
+awk 'BEGIN {seq=18} /^>/ {header=$0; next} seq-- == 0 {print header "\n" $0; exit}' MAG00001.fasta
+```
+
 ## Extract lines from file
 ```bash
 # Ex: lines 10 to 35
