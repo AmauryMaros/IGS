@@ -15,6 +15,10 @@ sbatch -n 10 ./slurm.sh 10
 squeue --me
 ```
 
+```bash
+scontrol show job <jobid>
+```
+
 ## Job Management
 Cancel a Job:
 ```bash
