@@ -22,7 +22,11 @@ scontrol show job <jobid>
 ## Job Management
 Cancel a Job:
 ```bash
+# all the job
 scancel job_id
+
+# those running on specific machine
+squeue -w grid-2-1-2 -u <user-id> -h | awk '{print $1}' | xargs -r scancel
 ```
 
 Get cluster information
