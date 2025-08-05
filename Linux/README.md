@@ -2,6 +2,7 @@
 
 ## awk
 ```bash
+Print seq #19 in fasta file
 awk 'BEGIN {seq=18} /^>/ {header=$0; next} seq-- == 0 {print header "\n" $0; exit}' MAG00001.fasta
 ```
 
