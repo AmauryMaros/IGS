@@ -1,5 +1,14 @@
 # Usefull commands
 
+## VIM
+```bash
+# Delete a pattern on the current line
+:s/pattern//g
+
+# Delete a pattern in the whole file
+:%s/pattern//g
+```
+
 ## awk
 ```bash
 # Print 19th seq of fasta file
